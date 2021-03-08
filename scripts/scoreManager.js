@@ -70,30 +70,21 @@ const scoreMan = {
     },
 
     setFirstReelResult(symNumber, linePos) {
-        if (symNumber === undefined)
-            this._firstReelRes[0] = this.getRandomSymIndex();
-        else
-            this._firstReelRes[0] = symNumber;
+        // set either set fixed symbol or a random one
+        this._firstReelRes[0] = symNumber < 0 ? this.getRandomSymIndex() : symNumber;
 
-        this._firstReelRes[1] = linePos || this.getRandomLine();
+        // set either set fixed line or random one
+        this._firstReelRes[1] = linePos === '' ? this.getRandomLine() : linePos;
     },
 
     setSecondReelResult(symNumber, linePos) {
-        if (symNumber === undefined)
-            this._secondReelRes[0] = this.getRandomSymIndex();
-        else
-            this._secondReelRes[0] = symNumber;
-
-        this._secondReelRes[1] = linePos || this.getRandomLine();
+        this._secondReelRes[0] = symNumber < 0 ? this.getRandomSymIndex() : symNumber;
+        this._secondReelRes[1] = linePos === '' ? this.getRandomLine() : linePos;
     },
 
     setThirdReelResult(symNumber, linePos) {
-        if (symNumber === undefined)
-            this._thirdReelRes[0] = this.getRandomSymIndex();
-        else
-            this._thirdReelRes[0] = symNumber;
-
-        this._thirdReelRes[1] = linePos || this.getRandomLine();
+        this._thirdReelRes[0] = symNumber < 0 ? this.getRandomSymIndex() : symNumber;
+        this._thirdReelRes[1] = linePos === '' ? this.getRandomLine() : linePos;
     },
 
     checkResults() {

@@ -10,10 +10,7 @@ const player = {
     },
 
     set balance(num) {
-        if (typeof num === 'number')
             this._balance = num;
-        else
-            alert('Entered balance is not a number');
     },
 
     addBalance(amount) {

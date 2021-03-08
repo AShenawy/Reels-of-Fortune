@@ -1,18 +1,6 @@
 // By Ahmed ElShenawy (elshenawy.ahmed@gmail.com)
 // this is the main P5.js script file which runs the game
 
-/*
-doneTODO spin button to start spinning
-doneTODO reels spin for 2 secs then stop
-doneTODO spin reduces balance by 1
-doneTODO if balance is <= 0 don't play
-doneTODO pick random values for reels to land on
-doneTODO allow end values to be determined
-TODO force balance input to accept numbers only
-doneTODO calculate winnings based on pay table
-notDoneTODO adjust timing of reels stopping / cheat it (fast roll and redraw at position)
-doneTODO clicking pay table displays it (image) + button to close it
- */
 // UI elements
 let body;   // graphic for slot machine body/frame
 let payTableScreen; // graphic for pay table
@@ -84,6 +72,7 @@ function setup() {
     let cnv = createCanvas(1280, 720)
     cnv.parent('canvas');
     scoreMan.numSymbols = reelNamedSymbols.length;
+
 
     // create reels, each section has 2 reels for continuous scrolling
     reelLeft0 = createReel(reelSymbolImages, reelNamedSymbols, 'left');
@@ -192,11 +181,8 @@ function draw() {
     if (stopReelsRight)
         stopReels('right');
 
-    //TODO remove these squares
-    // squares for looping debug
-    debugSquares();
-
     drawUI();
+    // debugSquares();
 }
 
 function checkLoop() {
@@ -541,9 +527,9 @@ function drawUI() {
     // balance & play table area
     push();
     translate(width - 320, height - 150);
-    fill('black');
-    stroke('green');
-    rect(0, 0, 300, 140);
+    // fill('black');
+    // stroke('green');
+    // rect(0, 0, 300, 140);
     fill('gold');
     stroke('orange');
     strokeWeight(3);
@@ -597,6 +583,18 @@ function drawUI() {
         // pay table button
         push();
         btnPT.draw();
+        pop();
+    }
+
+    if (isDebugMode) {
+        push();
+        fill('black');
+        rect(0,0, width, 70);
+        fill('red');
+        textStyle(BOLD);
+        textSize(46);
+        textAlign(CENTER);
+        text('-=# DEBUG MODE #=-', width * 0.5, 50);
         pop();
     }
 }
