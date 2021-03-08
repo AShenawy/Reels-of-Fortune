@@ -19,3 +19,8 @@ const numToCurrency = num => {
     });
     return formatter.format(num);
 }
+
+// returns object's key specified by a value
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}

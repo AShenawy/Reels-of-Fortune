@@ -14,12 +14,12 @@ doneTODO clicking pay table displays it (image) + button to close it
  */
 // debug mode variables
 let isDebugMode = true; // allows fixing reel positions
-let reel1FixedSym = 0;
-let reel2FixedSym = 2;
-let reel3FixedSym = 0;
-let reel1FixedLine = 'mid';
-let reel2FixedLine = 'mid';
-let reel3FixedLine = 'mid';
+let reel1FixedSym = 4;
+let reel2FixedSym = 4;
+let reel3FixedSym = 4;
+let reel1FixedLine = 'bot';
+let reel2FixedLine = 'bot';
+let reel3FixedLine = 'bot';
 
 let body;   // graphic for slot machine body/frame
 let payTableScreen; // graphic for pay table
@@ -69,6 +69,7 @@ function setup() {
     let cnv = createCanvas(1280, 720)
     cnv.parent('canvas');
     scoreMan.numSymbols = reelNamedSymbols.length;
+
 
     // create reels, each section has 2 reels for continuous scrolling
     reelLeft0 = createReel(reelSymbolImages, reelNamedSymbols, 'left');
@@ -132,10 +133,6 @@ function setup() {
     btnExit.textSize = 32;
 }
 
-function write()
-{
-    console.log('done!');
-}
 
 // p5*js function to draw elements. Runs continuously by default
 function draw() {
@@ -276,16 +273,16 @@ function stopReels(side) {
             // shift distance 'd' reference point to the win line picked by game/ input from debugger
             let d1 = baseline1 + (scoreMan.winLines.indexOf(scoreMan.firstReelRes[1]) * winLineDist);
 
-            console.log(d1);
+            // console.log(d1);
             if (d1 > 3 || d1 < -20) {
-                console.log('first reel below or above stop point');
+                // console.log('first reel below or above stop point');
                 reels.forEach(reel => {
                     if (reel.order === side)
                         reel.moveDown();
                 });
             }
             else {
-                console.log('first reel reached stop point');
+                // console.log('first reel reached stop point');
                 stopReelsLeft = false;  //reset condition for draw func
                 reels.forEach(reel => {
                     if (reel.order === side)
@@ -306,14 +303,14 @@ function stopReels(side) {
             let d2 = baseline2 + (scoreMan.winLines.indexOf(scoreMan.secondReelRes[1]) * winLineDist);
 
             if (d2 > 3 || d2 < -20) {
-                console.log('center reel below or above stop point');
+                // console.log('center reel below or above stop point');
                 reels.forEach(reel => {
                     if (reel.order === side)
                         reel.moveDown();
                 });
             }
             else {
-                console.log('center reel reached stop point');
+                // console.log('center reel reached stop point');
                 stopReelsMid = false;  //reset condition for draw func
                 reels.forEach(reel => {
                     if (reel.order === side)
@@ -334,14 +331,14 @@ function stopReels(side) {
             let d3 = baseline3 + (scoreMan.winLines.indexOf(scoreMan.thirdReelRes[1]) * winLineDist);
 
             if (d3 > 3 || d3 < -20) {
-                console.log('right reel below or above stop point');
+                // console.log('right reel below or above stop point');
                 reels.forEach(reel => {
                     if (reel.order === side)
                         reel.moveDown();
                 });
             }
             else {
-                console.log('right reel reached stop point');
+                // console.log('right reel reached stop point');
                 stopReelsRight = false;  //reset condition for draw func
                 reels.forEach(reel => {
                     if (reel.order === side)
@@ -375,7 +372,7 @@ function drawScoreLines() {
 function drawUI() {
     // body/frame
     // push();
-    image(body, 0, 0);
+    // image(body, 0, 0);
     // pop();
 
     // balance & play table area

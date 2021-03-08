@@ -2,22 +2,22 @@
 // This script handles the results of a round of play
 
 const betOutcomes = {
-    NOWIN: 'no win',
-    CHERRYTOP: '3xcherry top',
-    CHERRYMID: '3xcherry mid',
-    CHERRYBOT: '3xcherry bot',
-    SEVENS: '3xseven',
-    CHERRY7COMBO: 'cherry seven combo',
-    BAR3: '3xbar 3',
-    BAR2: '3xbar 2',
-    BAR: '3xbar',
-    BARCOMBO: 'bars combo'
+    NOWIN: 0,
+    BARCOMBO: 1,
+    BAR: 2,
+    BAR2: 3,
+    BAR3: 4,
+    CHERRY7COMBO: 5,
+    SEVENS: 6,
+    CHERRYMID: 7,
+    CHERRYTOP: 8,
+    CHERRYBOT: 9,
 }
 
 const scoreMan = {
     _numSymbols: 5,   // number of symbols in single reel. default = 5
     _winLines: ['top', 'mid', 'bot'],   // available win lines
-    _firstReelRes: [ -1, ''],   // initialise empty
+    _firstReelRes: [-1, ''],   // initialise empty
     _secondReelRes: [-1, ''],
     _thirdReelRes: [-1, ''],
     _betResult: '',
@@ -97,7 +97,7 @@ const scoreMan = {
     },
 
     checkResults() {
-        // check if all reels landed on mid win line
+            // check if all reels landed on mid win line
         if (checkAllSameLine(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1]) === 'mid') {
             // check 3x combos
             if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
@@ -110,13 +110,29 @@ const scoreMan = {
                 this._betResult = getLineOutcome(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0]);
             }
         }
-        // check if all reels landed on either top or bottom lines
+            // check if all reels landed on either top or bottom lines
+            //TODO this part is fucked UP!
         else if(checkTopBot(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1])) {
             // at this point we have 2 possible combos on either top/bottom lines or both, which need to be compared
             let topLineResult, botLineResult;
 
+            // check 3x combo
+            if (checkAllSameLine(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1]) !== '') {
+                if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
+                    const sumTop = getSymValue(this._firstReelRes, 'top') + getSymValue(this._secondReelRes, 'top') + getSymValue(this._thirdReelRes, 'top');
+                    const sumBot = getSymValue(this._firstReelRes, 'bot') + getSymValue(this._secondReelRes, 'bot') + getSymValue(this._thirdReelRes, 'bot');
+                    topLineResult = get3XCombo('top', sumTop);
+                    botLineResult = get3XCombo('bot', sumBot);
+                    console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
+                    console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
+
+                    // bet result is the greater of either result
+                    this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
+                    console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
+                }
+            }
         }
-        // reels landed on mix of top/bottom and mid lines
+            // reels landed on mix of top/bottom and mid lines
         else {
             console.log('No Winning Line!');
             this._betResult = betOutcomes.NOWIN;
@@ -165,7 +181,7 @@ const getSymValue = (reelResult, checkLine) => {
         return -1;
     }
 
-    
+
     if (reelResult[1] === checkLine) {
         // symbol landed on check line. return symbol value
         return reelResult[0];
@@ -173,12 +189,12 @@ const getSymValue = (reelResult, checkLine) => {
     else if (reelResult[1] === 'top' && checkLine === 'bot') {
         // symbol landed above check line. return next symbol in reel
         // if symbol is at end of reel, return first symbol
-        return ++reelResult[0] > (scoreMan.numSymbols -1) ? 0 : reelResult[0];
+        return reelResult[0] + 1 > (scoreMan.numSymbols -1) ? 0 : reelResult[0] + 1;
     }
-    else if (reelResult[1] === 'bot' && checkLine === 'top') {
+    else {
         // symbol landed below check line. return previous symbol in reel
         // if symbol is at start of reel, return last symbol
-        return --reelResult[0] < 0 ? scoreMan.numSymbols -1 : reelResult[0];
+        return reelResult[0] - 1 < 0 ? scoreMan.numSymbols -1 : reelResult[0] - 1;
     }
 }
 
