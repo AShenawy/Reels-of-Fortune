@@ -111,25 +111,35 @@ const scoreMan = {
             }
         }
             // check if all reels landed on either top or bottom lines
-            //TODO this part is fucked UP!
         else if(checkTopBot(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1])) {
             // at this point we have 2 possible combos on either top/bottom lines or both, which need to be compared
             let topLineResult, botLineResult;
 
-            // check 3x combo
-            if (checkAllSameLine(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1]) !== '') {
-                if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
-                    const sumTop = getSymValue(this._firstReelRes, 'top') + getSymValue(this._secondReelRes, 'top') + getSymValue(this._thirdReelRes, 'top');
-                    const sumBot = getSymValue(this._firstReelRes, 'bot') + getSymValue(this._secondReelRes, 'bot') + getSymValue(this._thirdReelRes, 'bot');
-                    topLineResult = get3XCombo('top', sumTop);
-                    botLineResult = get3XCombo('bot', sumBot);
-                    console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
-                    console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
+            // store symbols for each line on both top and bot lines
+            const topLineSymbols = [getSymValue(this._firstReelRes, 'top'), getSymValue(this._secondReelRes, 'top'), getSymValue(this._thirdReelRes, 'top')];
+            const botLineSymbols = [getSymValue(this._firstReelRes, 'bot'), getSymValue(this._secondReelRes, 'bot'), getSymValue(this._thirdReelRes, 'bot')];
 
-                    // bet result is the greater of either result
-                    this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
-                    console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
-                }
+            // if top line has same symbols, then so does bot line. get the 3x combos
+            if (checkSameSymbol(topLineSymbols[0], topLineSymbols[1], topLineSymbols[2])) {
+                const sumTopIndex = topLineSymbols.reduce((a, b) => a + b, 0);
+                const sumBotIndex = botLineSymbols.reduce((a, b) => a + b, 0);
+
+                topLineResult = get3XCombo('top', sumTopIndex);
+                botLineResult = get3XCombo('bot', sumBotIndex);
+                console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
+                console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
+
+                this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
+                console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
+            }
+            else {
+                topLineResult = getLineOutcome(topLineSymbols[0], topLineSymbols[1], topLineSymbols[2]);
+                botLineResult = getLineOutcome(botLineSymbols[0], botLineSymbols[1], botLineSymbols[2]);
+                console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
+                console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
+
+                this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
+                console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
             }
         }
             // reels landed on mix of top/bottom and mid lines

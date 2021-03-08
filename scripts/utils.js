@@ -21,6 +21,6 @@ const numToCurrency = num => {
 }
 
 // returns object's key specified by a value
-function getKeyByValue(object, value) {
+const getKeyByValue = (object, value) => {
     return Object.keys(object).find(key => object[key] === value);
 }

@@ -13,12 +13,12 @@ TODO adjust timing of reels stopping / cheat it (fast roll and redraw at positio
 doneTODO clicking pay table displays it (image) + button to close it
  */
 // debug mode variables
-let isDebugMode = true; // allows fixing reel positions
-let reel1FixedSym = 4;
-let reel2FixedSym = 4;
-let reel3FixedSym = 4;
-let reel1FixedLine = 'bot';
-let reel2FixedLine = 'bot';
+let isDebugMode = false; // allows fixing reel positions
+let reel1FixedSym = 2;
+let reel2FixedSym = 1;
+let reel3FixedSym = 1;
+let reel1FixedLine = 'top';
+let reel2FixedLine = 'top';
 let reel3FixedLine = 'bot';
 
 let body;   // graphic for slot machine body/frame
