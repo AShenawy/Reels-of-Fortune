@@ -1,4 +1,5 @@
 // By Ahmed ElShenawy (elshenawy.ahmed@gmail.com)
+// this is the main P5.js script file which runs the game
 
 /*
 doneTODO spin button to start spinning
@@ -9,14 +10,23 @@ doneTODO pick random values for reels to land on
 doneTODO allow end values to be determined
 TODO force balance input to accept numbers only
 doneTODO calculate winnings based on pay table
-TODO adjust timing of reels stopping / cheat it (fast roll and redraw at position)
+notDoneTODO adjust timing of reels stopping / cheat it (fast roll and redraw at position)
 doneTODO clicking pay table displays it (image) + button to close it
  */
-
+// UI elements
 let body;   // graphic for slot machine body/frame
 let payTableScreen; // graphic for pay table
 let isPayTableOn = false; // switch for displaying the pay table
+let winGIFs;    // array of winning GIFs
+let displayedWinGIF;    // specific image which will actually show
+let isWinGIFOn = false; // switch for displaying the winning image
+let isLineBlinking = false;     // switch for win lines blinking
+let winLineDist;    // for drawing win lines and reference point where reels are drawn
+let topLineCoord = {};
+let midLineCoord = {};
+let botLineCoord = {};
 
+// reel-related elements
 let reelSymbolImages;
 const reelNamedSymbols = ['3BAR', 'BAR', '2BAR', '7', 'CHERRY'];
 let reelLeft0, reelLeft1, reelCnt0, reelCnt1, reelRight0, reelRight1;
@@ -28,15 +38,15 @@ let moveReelsRight = false;
 let stopReelsLeft = false;
 let stopReelsMid = false;
 let stopReelsRight = false;
-
 let loopRef;    // reference point where a reel will loop back to top. depends on reel size
-let winLineDist;    // for drawing win lines and reference point where reels are drawn
 
+// buttons declarations
 let btnSpin; // button to start playing
-let isSpinning = false;
+let isSpinningDisabled = false;
 let btnPT; // button to display pay table
 let btnExit; // button to exit pay table
 
+// misc elements
 let gameMessage; // for displaying text in message screen
 
 
@@ -48,12 +58,25 @@ function preload() {
     const s_bar3 = loadImage('./images/reel/3xBAR.png');
     const s_seven = loadImage('./images/reel/7.png');
     const s_cherry = loadImage('./images/reel/Cherry.png');
-    body = loadImage('./images/Frame.png');
-    payTableScreen = loadImage('./images/PayTable.png');
 
     // Slot machine has 3 reels, each having following 5 symbols in order:
     // 3xBAR, BAR, 2xBAR, 7, CHERRY
     reelSymbolImages = [s_bar3, s_bar, s_bar2, s_seven, s_cherry];
+
+    body = loadImage('./images/Frame.png');
+    payTableScreen = loadImage('./images/PayTable.png');
+    const winCherryBot = loadImage('./images/winImages/winCherryBot.gif');
+    const winCherryTop = loadImage('./images/winImages/winCherryTop.gif');
+    const winCherryMid = loadImage('./images/winImages/winCherryMid.gif');
+    const winCherrySeven = loadImage('./images/winImages/winCherrySeven.gif');
+    const winSevens = loadImage('./images/winImages/winSevens.gif');
+    const win3BAR = loadImage('./images/winImages/win3BAR.gif');
+    const win2BAR = loadImage('./images/winImages/win2BAR.gif');
+    const winBAR = loadImage('./images/winImages/winBAR.gif');
+    const winBARCombo = loadImage('./images/winImages/winBarCombo.gif');
+    const tryAgain = loadImage('./images/winImages/lose.gif');
+    // array should follow the betOutcomes enum
+    winGIFs = [tryAgain, winBARCombo, winBAR, win2BAR, win3BAR, winCherrySeven, winSevens, winCherryMid, winCherryTop, winCherryBot];
 }
 
 // p5*js function to setup elements, runs once on start
@@ -61,7 +84,6 @@ function setup() {
     let cnv = createCanvas(1280, 720)
     cnv.parent('canvas');
     scoreMan.numSymbols = reelNamedSymbols.length;
-
 
     // create reels, each section has 2 reels for continuous scrolling
     reelLeft0 = createReel(reelSymbolImages, reelNamedSymbols, 'left');
@@ -75,6 +97,24 @@ function setup() {
     // setup references
     loopRef = reelLeft0.size + spacing;     // all reels assumed to be same size
     winLineDist = (reelLeft0.symH * 0.5) + (spacing * 0.5);
+    topLineCoord = {
+        x1: 0,
+        y1: (height * 0.5) - winLineDist,
+        x2: width,
+        y2: (height * 0.5) - winLineDist,
+    }
+    midLineCoord = {
+        x1: 0,
+        y1: height * 0.5,
+        x2: width,
+        y2: height * 0.5,
+    }
+    botLineCoord = {
+        x1: 0,
+        y1: height * 0.5 + winLineDist,
+        x2: width,
+        y2: (height * 0.5) + winLineDist,
+    }
 
     // position reels
     const topPos = height * 0.5 - winLineDist - reelLeft0.symH * 0.5;
@@ -87,7 +127,6 @@ function setup() {
     const rightPos = (width * 0.5) + (reelRight0.symW * 0.5) + gutter;
     reelRight0.pos = createVector(rightPos, topPos);
     reelRight1.pos = createVector(rightPos, topPos -reelRight1.size - spacing);
-
 
     // create spin button
     btnSpin = new Clickable();
@@ -131,7 +170,6 @@ function draw() {
     background(180);
     drawScoreLines();
 
-
     // draw reels
     reels.forEach(reel => reel.render());
 
@@ -159,9 +197,6 @@ function draw() {
     debugSquares();
 
     drawUI();
-    // drawButtons();
-    // noLoop();
-
 }
 
 function checkLoop() {
@@ -172,14 +207,18 @@ function checkLoop() {
     );
 }
 
+function disablePlayerSpin(value) {
+    isSpinningDisabled = value;
+}
+
 function play() {
-    if (player.balance > 0 && !isSpinning) {
-        isSpinning = true;
+    if (player.balance > 0 && !isSpinningDisabled) {
+        disablePlayerSpin(true);
         player.placeBet();
         startSpin();
         displayMessage('Game started. Good luck!');
     }
-    else if (isSpinning) {
+    else if (isSpinningDisabled) {
         displayMessage('Game in progress. Please wait for \nthe reels to stop before spinning again.');
     }
     else
@@ -206,6 +245,7 @@ function startSpin() {
         console.log('third reel values: ' + scoreMan.thirdReelRes);
     }
 
+    // check spin bet outcome
     scoreMan.checkResults();
 
     // allow all reels to move
@@ -220,8 +260,6 @@ function startSpin() {
     setTimeout(function() {
         stopSpin('left');
         }, spinTime);
-
-
 }
 
 function stopSpin(side) {
@@ -336,18 +374,148 @@ function stopReels(side) {
                     if (reel.order === side)
                         reel.resetDownVelocity();
                 });
+
+                // check and display spin results after last reel stopped
+                checkWinnings();
             }
             break;
     }
+}
 
-    // allow player to spin again after last reel stops
-    if (side === 'right')
-        isSpinning = false;
+function checkWinnings() {
+    switch (scoreMan.betResult[0]) {
+        case betOutcomes.NOWIN:
+            displayWinResult(betOutcomes.NOWIN);
+            displayMessage('No luck. Try Again!');
+            break;
+
+        case betOutcomes.BARCOMBO:
+            player.addBalance(5);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.BARCOMBO);
+            displayMessage('Congratulations! BAR combination!');
+            break;
+
+        case betOutcomes.BAR:
+            player.addBalance(10);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.BAR);
+            displayMessage('Congratulations! 3 BAR combo!');
+            break;
+
+        case betOutcomes.BAR2:
+            player.addBalance(20);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.BAR2);
+            displayMessage('Congratulations! 3 2xBAR combo!');
+            break;
+
+        case betOutcomes.BAR3:
+            player.addBalance(50);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.BAR3);
+            displayMessage('Congratulations! 3 3xBAR combo!');
+            break;
+
+        case betOutcomes.CHERRY7COMBO:
+            player.addBalance(75);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.CHERRY7COMBO);
+            displayMessage('Congratulations! Cherry & 7 combo!');
+            break;
+
+        case betOutcomes.SEVENS:
+            player.addBalance(150);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.SEVENS);
+            displayMessage('Congratulations! 3 7s combo!');
+            break;
+
+        case betOutcomes.CHERRYMID:
+            player.addBalance(1000);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.CHERRYMID);
+            displayMessage('Huge Win! 3 Cherry mid line combo!');
+            break;
+
+        case betOutcomes.CHERRYTOP:
+            player.addBalance(2000);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.CHERRYTOP);
+            displayMessage('Mega Win! 3 Cherry top line combo!');
+            break;
+
+        case betOutcomes.CHERRYBOT:
+            player.addBalance(4000);
+            displayBlinkingLine(true);
+            displayWinResult(betOutcomes.CHERRYBOT);
+            displayMessage('JACKPOT!! 3 Cherry bottom line combo!');
+            break;
+    }
+
+    // allow player to spin again after last reel stops and win showed
+    disablePlayerSpin(false);
+
+    setTimeout(function (){
+        displayBlinkingLine(false);
+    }, 2000);
+}
+
+function displayWinResult(winCondition) {
+    displayedWinGIF = winGIFs[winCondition];
+    displayGIF(true);
+
+    // hide GIF after 2 seconds
+    setTimeout(function () {
+        displayGIF(false);
+    }, 2000);
+}
+
+function displayGIF(value) {
+    isWinGIFOn = value;
+}
+
+function blinkLine() {
+    switch (scoreMan.betResult[1]) {
+        case 'top':
+            push();
+            if (frameCount %  21 > 8) {
+                strokeWeight(5);
+                stroke('gold');
+                line(topLineCoord.x1, topLineCoord.y1, topLineCoord.x2, topLineCoord.y2);
+            }
+            pop();
+            break;
+
+        case 'mid':
+            push();
+            if (frameCount %  21 > 8) {
+                strokeWeight(5);
+                stroke('gold');
+                line(midLineCoord.x1, midLineCoord.y1, midLineCoord.x2, midLineCoord.y2);
+            }
+            pop();
+            break;
+
+        case 'bot':
+            push();
+            if (frameCount %  21 > 8) {
+                strokeWeight(5);
+                stroke('gold');
+                line(botLineCoord.x1, botLineCoord.y1, botLineCoord.x2, botLineCoord.y2);
+            }
+            pop();
+            break;
+    }
+}
+
+function displayBlinkingLine(value) {
+    isLineBlinking = value;
 }
 
 function displayPayTable(value) {
     // only display table if not spinning
-    if (!isSpinning)
+    if (!isSpinningDisabled)
         isPayTableOn = value;
 }
 
@@ -355,17 +523,20 @@ function drawScoreLines() {
     push();
     stroke(0);
     strokeWeight(5);
-    line(0, (height * 0.5) - winLineDist, width, (height * 0.5) - winLineDist);   // top line
-    line(0, height * 0.5, width, height * 0.5);     // mid line
-    line(0, (height * 0.5) + winLineDist, width, (height * 0.5) + winLineDist);   // bot line
+    line(topLineCoord.x1, topLineCoord.y1, topLineCoord.x2, topLineCoord.y2);   // top line
+    line(midLineCoord.x1, midLineCoord.y1, midLineCoord.x2, midLineCoord.y2);     // mid line
+    line(botLineCoord.x1, botLineCoord.y1, botLineCoord.x2, botLineCoord.y2);   // bot line
     pop();
+
+    if (isLineBlinking)
+        blinkLine();
 }
 
 function drawUI() {
     // body/frame
-    // push();
-    // image(body, 0, 0);
-    // pop();
+    push();
+    image(body, 0, 0);
+    pop();
 
     // balance & play table area
     push();
@@ -399,6 +570,14 @@ function drawUI() {
     textSize(16);
     text(gameMessage, 10, 25, 280, 230);
     pop();
+
+    // show win images
+    if (isWinGIFOn) {
+        push();
+        imageMode(CENTER);
+        image(displayedWinGIF, 180, height * 0.5);
+        pop();
+    }
 
     // show pay table and accompanying exit button
     if (isPayTableOn) {

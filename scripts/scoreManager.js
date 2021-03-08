@@ -20,7 +20,7 @@ const scoreMan = {
     _firstReelRes: [-1, ''],   // initialise empty
     _secondReelRes: [-1, ''],
     _thirdReelRes: [-1, ''],
-    _betResult: '',
+    _betResult: [-1, ''],
 
     get winLines() {
         return this._winLines;
@@ -103,11 +103,11 @@ const scoreMan = {
             if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
                 // same symbol combo, check which symbol based on summation of symbol index value
                 const sumSymbolIndex = this._firstReelRes[0] + this._secondReelRes[0] + this._thirdReelRes[0];
-                this._betResult = get3XCombo(this._firstReelRes[1], sumSymbolIndex);
+                this._betResult = [get3XCombo(this._firstReelRes[1], sumSymbolIndex), 'mid'];
             }
             // check other combinations
             else {
-                this._betResult = getLineOutcome(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0]);
+                this._betResult = [getLineOutcome(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0]), 'mid'];
             }
         }
             // check if all reels landed on either top or bottom lines
@@ -127,22 +127,22 @@ const scoreMan = {
                 topLineResult = get3XCombo('top', sumTopIndex);
                 botLineResult = get3XCombo('bot', sumBotIndex);
 
-                this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
+                this._betResult = (topLineResult >= botLineResult) ? [topLineResult, 'top'] : [botLineResult, 'bot'];
             }
             else {
                 topLineResult = getLineOutcome(topLineSymbols[0], topLineSymbols[1], topLineSymbols[2]);
                 botLineResult = getLineOutcome(botLineSymbols[0], botLineSymbols[1], botLineSymbols[2]);
 
-                this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
+                this._betResult = (topLineResult >= botLineResult) ? [topLineResult, 'top'] : [botLineResult, 'bot'];
             }
             console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
             console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
-            console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
+            console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult[0]));
         }
             // reels landed on mix of top/bottom and mid lines
         else {
             console.log('No Winning Line!');
-            this._betResult = betOutcomes.NOWIN;
+            this._betResult = [betOutcomes.NOWIN, ''];
         }
     },
 }
