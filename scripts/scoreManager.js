@@ -15,7 +15,7 @@ const betOutcomes = {
 }
 
 const scoreMan = {
-    _numSymbols: 5,   // number of symbols in single reel
+    _numSymbols: 5,   // number of symbols in single reel. default = 5
     _winLines: ['top', 'mid', 'bot'],   // available win lines
     _firstReelRes: [ -1, ''],   // initialise empty
     _secondReelRes: [-1, ''],
@@ -40,6 +40,17 @@ const scoreMan = {
 
     get betResult() {
         return this._betResult;
+    },
+
+    get numSymbols() {
+        return this._numSymbols;
+    },
+
+    set numSymbols(value) {
+        if (typeof value === 'number' && value > 0)
+            this._numSymbols = value;
+        else
+            console.error("Setting value of numSymbols in scoreManager is of wrong type or value <= 0");
     },
 
     getRandomSymIndex() {
@@ -87,7 +98,7 @@ const scoreMan = {
 
     checkResults() {
         // check if all reels landed on mid win line
-        if (checkAllSameLine(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1])) {
+        if (checkAllSameLine(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1]) === 'mid') {
             // check 3x combos
             if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
                 // same symbol combo, check which symbol based on summation of symbol index value
@@ -101,8 +112,11 @@ const scoreMan = {
         }
         // check if all reels landed on either top or bottom lines
         else if(checkTopBot(this._firstReelRes[1], this._secondReelRes[1], this._thirdReelRes[1])) {
-            // at this point we have possible combos on either top or bottom line or both
+            // at this point we have 2 possible combos on either top/bottom lines or both, which need to be compared
+            let topLineResult, botLineResult;
+
         }
+        // reels landed on mix of top/bottom and mid lines
         else {
             console.log('No Winning Line!');
             this._betResult = betOutcomes.NOWIN;
@@ -110,9 +124,12 @@ const scoreMan = {
     },
 }
 
-// returns whether all given line values are the same
+// returns whether all given line values are the same and returns it
 const checkAllSameLine = (line1, line2, line3) => {
-    return line1 === line2 && line1 === line3;
+    if (line1 === line2 && line1 === line3)
+        return line1;
+    else
+        return '';
 }
 
 // returns whether given line values belong either on top or bottom win lines
@@ -132,6 +149,37 @@ const checkTopBot = (line1, line2, line3) => {
 // returns whether given values all have same symbol index/number
 const checkSameSymbol = (sym1, sym2, sym3) => {
     return sym1 === sym2 && sym1 === sym3;
+}
+
+// returns symbol value for win line (top/bottom only) specified in second parameter
+const getSymValue = (reelResult, checkLine) => {
+    // error checks before doing function
+    if (checkLine === 'mid') {
+        console.warn('getSymValue function wrongfully used to check against mid win line.\n' +
+            'Use getSymValue only for checking against top or bottom win lines. Use ');
+        return -1;
+    }
+    else if (checkLine === '' || typeof checkLine !== 'string')
+    {
+        console.error("Wrong type or value for second parameter in getSymValue. Use string values of either 'top' or 'bot'.");
+        return -1;
+    }
+
+    
+    if (reelResult[1] === checkLine) {
+        // symbol landed on check line. return symbol value
+        return reelResult[0];
+    }
+    else if (reelResult[1] === 'top' && checkLine === 'bot') {
+        // symbol landed above check line. return next symbol in reel
+        // if symbol is at end of reel, return first symbol
+        return ++reelResult[0] > (scoreMan.numSymbols -1) ? 0 : reelResult[0];
+    }
+    else if (reelResult[1] === 'bot' && checkLine === 'top') {
+        // symbol landed below check line. return previous symbol in reel
+        // if symbol is at start of reel, return last symbol
+        return --reelResult[0] < 0 ? scoreMan.numSymbols -1 : reelResult[0];
+    }
 }
 
 // returns either winning combo or no win for dissimilar symbols (should be on same line)
@@ -162,7 +210,7 @@ const getLineOutcome = (sym1, sym2, sym3) => {
 }
 
 // returns which 3x combo won (same line and symbol)
-// first parameter linePos for Cherry combos
+// first parameter for line-dependent Cherry combos
 const get3XCombo = (linePos, sumSymbols) => {
     switch(sumSymbols) {
         case 12:    // 3xCherry (sym index 4)

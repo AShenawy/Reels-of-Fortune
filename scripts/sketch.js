@@ -68,6 +68,7 @@ function preload() {
 function setup() {
     let cnv = createCanvas(1280, 720)
     cnv.parent('canvas');
+    scoreMan.numSymbols = reelNamedSymbols.length;
 
     // create reels, each section has 2 reels for continuous scrolling
     reelLeft0 = createReel(reelSymbolImages, reelNamedSymbols, 'left');
