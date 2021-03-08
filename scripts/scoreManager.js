@@ -126,21 +126,18 @@ const scoreMan = {
 
                 topLineResult = get3XCombo('top', sumTopIndex);
                 botLineResult = get3XCombo('bot', sumBotIndex);
-                console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
-                console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
 
                 this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
-                console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
             }
             else {
                 topLineResult = getLineOutcome(topLineSymbols[0], topLineSymbols[1], topLineSymbols[2]);
                 botLineResult = getLineOutcome(botLineSymbols[0], botLineSymbols[1], botLineSymbols[2]);
-                console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
-                console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
 
                 this._betResult = (topLineResult >= botLineResult) ? topLineResult : botLineResult;
-                console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
             }
+            console.log('top line bet outcome: enum value '+ topLineResult + ', bet value: ' + getKeyByValue(betOutcomes, topLineResult));
+            console.log('bot line bet outcome: enum value: '+ botLineResult + ', bet value: ' + getKeyByValue(betOutcomes, botLineResult));
+            console.log('best bet result: ' + this._betResult + ', bet value: ' + getKeyByValue(betOutcomes, this._betResult));
         }
             // reels landed on mix of top/bottom and mid lines
         else {

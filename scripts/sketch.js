@@ -8,18 +8,10 @@ doneTODO if balance is <= 0 don't play
 doneTODO pick random values for reels to land on
 doneTODO allow end values to be determined
 TODO force balance input to accept numbers only
-TODO calculate winnings based on pay table
+doneTODO calculate winnings based on pay table
 TODO adjust timing of reels stopping / cheat it (fast roll and redraw at position)
 doneTODO clicking pay table displays it (image) + button to close it
  */
-// debug mode variables
-let isDebugMode = false; // allows fixing reel positions
-let reel1FixedSym = 2;
-let reel2FixedSym = 1;
-let reel3FixedSym = 1;
-let reel1FixedLine = 'top';
-let reel2FixedLine = 'top';
-let reel3FixedLine = 'bot';
 
 let body;   // graphic for slot machine body/frame
 let payTableScreen; // graphic for pay table
