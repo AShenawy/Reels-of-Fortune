@@ -17,4 +17,4 @@ Another use for the Debug Menu is to add credits. Note that the minimum value is
   
 * The game is planned to have an  '<i><b>Add Balance</b></i>' below the balance indicator. Hence, the little empty space below it.
   
-* Would be good to include some sound effects as well
+* Would be good to include some sound effects as well.
