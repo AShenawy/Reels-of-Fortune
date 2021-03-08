@@ -1,0 +1,4 @@
+# Folders
+/art wip
+/.idea
+
