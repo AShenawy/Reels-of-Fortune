@@ -68,8 +68,8 @@ const createDebugMenu = () => {
     reel1SymSelect.option('7', 3);
     reel1SymSelect.option('CHERRY', 4);
     reel1SymSelect.changed(function () {
-        reel1FixedSym = reel1SymSelect.value();
-        console.log('picked ' +reel1FixedSym+ ' for reel 1');
+        reel1FixedSym = parseInt(reel1SymSelect.value());
+        console.log('picked ' +reel1FixedSym+ ' for reel 1');        
     });
 
     reel1LineSelect = createSelect();
@@ -99,7 +99,7 @@ const createDebugMenu = () => {
     reel2SymSelect.option('7', 3);
     reel2SymSelect.option('CHERRY', 4);
     reel2SymSelect.changed(function () {
-        reel2FixedSym = reel2SymSelect.value();
+        reel2FixedSym = parseInt(reel2SymSelect.value());
         console.log('picked ' + reel2FixedSym + ' for reel 2');
     });
 
@@ -130,10 +130,10 @@ const createDebugMenu = () => {
     reel3SymSelect.option('7', 3);
     reel3SymSelect.option('CHERRY', 4);
     reel3SymSelect.changed(function () {
-        reel3FixedSym = reel3SymSelect.value();
+        reel3FixedSym = parseInt(reel3SymSelect.value());
         console.log('picked ' + reel3FixedSym + ' for reel 3');
     });
-
+	
     reel3LineSelect = createSelect();
     reel3LineSelect.parent(d3);
     reel3LineSelect.option('Random Line', '');
