@@ -94,7 +94,7 @@ const scoreMan = {
             if (checkSameSymbol(this._firstReelRes[0], this._secondReelRes[0], this._thirdReelRes[0])) {
                 // same symbol combo, check which symbol based on summation of symbol index value
                 const sumSymbolIndex = this._firstReelRes[0] + this._secondReelRes[0] + this._thirdReelRes[0];
-                this._betResult = [get3XCombo(this._firstReelRes[1], sumSymbolIndex), 'mid'];
+                this._betResult = [get3XCombo('mid', sumSymbolIndex), 'mid'];
             }
             // check other combinations
             else {
@@ -106,7 +106,7 @@ const scoreMan = {
             // at this point we have 2 possible combos on either top/bottom lines or both, which need to be compared
             let topLineResult, botLineResult;
 
-            // store symbols for each line on both top and bot lines
+            // store symbols of each reel on both top and bot lines
             const topLineSymbols = [getSymValue(this._firstReelRes, 'top'), getSymValue(this._secondReelRes, 'top'), getSymValue(this._thirdReelRes, 'top')];
             const botLineSymbols = [getSymValue(this._firstReelRes, 'bot'), getSymValue(this._secondReelRes, 'bot'), getSymValue(this._thirdReelRes, 'bot')];
 
@@ -118,6 +118,7 @@ const scoreMan = {
                 topLineResult = get3XCombo('top', sumTopIndex);
                 botLineResult = get3XCombo('bot', sumBotIndex);
 
+				// compare which line is the higher score and make it the winning result
                 this._betResult = (topLineResult >= botLineResult) ? [topLineResult, 'top'] : [botLineResult, 'bot'];
             }
             else {
@@ -155,9 +156,8 @@ const checkTopBot = (line1, line2, line3) => {
             }
         }
     }
-    else {
-        return false;
-    }
+	
+	return false;
 }
 
 // returns whether given values all have same symbol index/number
@@ -167,13 +167,13 @@ const checkSameSymbol = (sym1, sym2, sym3) => {
 
 // returns symbol value for win line (top/bottom only) specified in second parameter
 const getSymValue = (reelResult, checkLine) => {
-    // error checks before doing function
+    // error checks
     if (checkLine === 'mid') {
         console.warn('getSymValue function wrongfully used to check against mid win line.\n' +
-            'Use getSymValue only for checking against top or bottom win lines. Use ');
+            'Use getSymValue only for checking against top or bottom win lines.');
         return -1;
     }
-    else if (checkLine === '' || typeof checkLine !== 'string')
+    else if (checkLine === '' || typeof checkLine !== 'string' || checkLine !== 'top' || checkLine !== 'bot')
     {
         console.error("Wrong type or value for second parameter in getSymValue. Use string values of either 'top' or 'bot'.");
         return -1;
